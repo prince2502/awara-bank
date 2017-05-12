@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Awara Bank</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+<body ng-app="userIndexModule">
+	<nav class="navbar navbar-default">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Awara Bank</a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li><a href="#accounts">Accounts</a></li>
+				<li><a href="#money">Money</a></li>
+			</ul>
+
+			<ul class="nav navbar-nav navbar-right">
+				<li ng-controller="AuthController"><a ng-href='#' ng-click='logout()'>Logout</a></li>
+				
+				<li><a href="#activity">Activity</a></li>
+			</ul>
+
+		</div>
+	</nav>
+
+	<div class="well activity-log" >	
+		<h3>Activity Log</h3>	
+		<p>This my friend is activity log for this user. If there are more users, they will have their own activity log  you 
+		just enjoy your stay here. Cast the vote after the beep signal</p>
+
+	</div>
+
+	<br/><br/><br/>
+
+	<div class="container"> 
+		<div ng-view ></div>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.11/ngStorage.js"></script>
+
+	<script src="../models/common/aurthorize.js"></script>
+	<script src="../services/common/location.js"></script>
+	<script src="../services/common/state.js"></script>
+
+	<script src="../models/common/server.js"></script>
+	<script src="../services/common/rest.js"></script>
+	<script src="../models/user/userIndex.js"></script>
+
+</body>
+</html>

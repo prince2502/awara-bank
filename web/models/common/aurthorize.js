@@ -1,0 +1,1 @@
+var Aurthorization = angular.module("Aurthorization", ['ngStorage']);

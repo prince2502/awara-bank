@@ -1,0 +1,12 @@
+.activity-log{
+
+	position: fixed;
+    top: 45;
+    right: 0;
+    width: 450px;
+    min-height: 500px;
+}
+
+.navbar {
+	margin-bottom: 0px;
+}
