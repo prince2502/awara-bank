@@ -52,6 +52,10 @@ service.redirectTo = function (path){
 	else land();
 }
 
+service.reload = function(){
+	window.location.reload();
+}
+
 return service;
 
 }]);

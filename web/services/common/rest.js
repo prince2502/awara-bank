@@ -1,5 +1,5 @@
-angular.module("Server").factory("Rest", ['$http', 
-	function($http){
+angular.module("Server").factory("Rest", ['$http', '$localStorage', 
+	function($http, $localStorage){
 
 		var domain = "http://localhost:8081/api";
 
@@ -42,7 +42,7 @@ angular.module("Server").factory("Rest", ['$http',
 		}
 
 		service.logout = function(callback){
-			post(domain + '/logout/', {}, callback);
+			post(domain + '/logout/', {token: $localStorage.token}, callback);
 		}
 
 		service.signUp = function(username, password, callback){
@@ -50,19 +50,20 @@ angular.module("Server").factory("Rest", ['$http',
 		}
 
 		service.getUserInfo = function(callback){
-			get(domain + '/user/', callback);
+			get(domain + '/user/?token=' + $localStorage.token, callback);
 		}
 
 		service.addDependent = function(username, password, callback){
-			post(domain + '/user/new', {username: username, password: password}, callback);
+			console.log(username , password);
+			post(domain + '/user/new', {username: username, password: password, token: $localStorage.token}, callback);
 		}
 
 		service.debit = function(amount, callback){
-			post(domain + '/debit/', {amount: amount}, callback);
+			post(domain + '/money/debit/', {amount: amount, token: $localStorage.token}, callback);
 		}
 
 		service.credit = function(amount, accoutId, callback){
-			post(domain + '/login/' + accoutId, {amount: amount}, callback);
+			post(domain + '/money/credit/' + accoutId, {amount: amount, token: $localStorage.token}, callback);
 		}
 
 		return service;

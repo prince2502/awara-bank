@@ -19,17 +19,18 @@
 			<ul class="nav navbar-nav navbar-right">
 				<li ng-controller="AuthController"><a ng-href='#' ng-click='logout()'>Logout</a></li>
 				
-				<li><a href="#activity">Activity</a></li>
+				<!-- I have no idea why code next works -->
+				<li><a href="" ng-click='showActivity = !showActivity'>Activity</a></li>
 			</ul>
 
 		</div>
 	</nav>
 
-	<div class="well activity-log" >	
-		<h3>Activity Log</h3>	
-		<p>This my friend is activity log for this user. If there are more users, they will have their own activity log  you 
-		just enjoy your stay here. Cast the vote after the beep signal</p>
-
+	<div class="well activity-log" ng-show="showActivity" ng-controller="ActivityController">
+		<!-- TIMING ..... 
+		<ul>
+			<li ng-repeat="act in activities">{{act.actor}} {{actTypes[act.action]}} {{act.actionInfo}} on {{act.date}}</li>
+		</ul> -->
 	</div>
 
 	<br/><br/><br/>
@@ -52,6 +53,7 @@
 	<script src="../models/common/server.js"></script>
 	<script src="../services/common/rest.js"></script>
 	<script src="../models/user/userIndex.js"></script>
+	<script src="../controllers/user/activity.js"></script>
 
 </body>
 </html>
