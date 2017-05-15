@@ -43,7 +43,7 @@ accSchema.statics.get = function(accountId, callback){
 		if(account){
 			
 			delete account.password;
-			delete account.isBase;
+			//delete account.isBase;
 
 			that.find({_id: account.linkedAcc}).lean().exec(function(err2, linkedAccounts){
 				account.linked = linkedAccounts;

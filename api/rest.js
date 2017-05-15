@@ -2,8 +2,7 @@
 var express    	= require('express');        // call express
 var app        	= express();                 // define our app using express
 var bodyParser 	= require('body-parser');
-var mongoose 	= require('mongoose');
-var session 	= require('express-session');
+var mongoose 	= require('mongoose');;
 var cookieParser = require('cookie-parser');
 var multer 		= require('multer');
 var upload 		= multer(); 
@@ -11,8 +10,11 @@ var cors 		= require('cors');
 // db ...............
 var Account 	= require('./model/Account.js');
 
-
 var config 		= require('./config.js');
+
+var jwt    		= require('jsonwebtoken'); 
+var morgan      = require('morgan');
+
 
 mongoose.Promise = global.Promise;
 
@@ -21,17 +23,14 @@ mongoose.Promise = global.Promise;
 mongoose.connect(config.database);
 
 // middlleware .............     figure out more abuot middleware and how it works and why is it needed?
+
+app.set('secret', config.secret);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
-//app.use(upload.array());
-app.use(cookieParser());
-app.use(session({
-	secret: config.secret,
-    resave: false,
-    saveUninitialized: true
-}));
-
 app.use(cors());
+
+app.use(morgan('dev'));
 
 var port = 8081;        // set our port
 
@@ -39,14 +38,32 @@ var port = 8081;        // set our port
 var router = express.Router();              // get an instance of the express Router
 
 var auth = function(req, res, next){
-	if(req.session.account) {
-		next();
+
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+	if(token){
+
+		jwt.verify(token, app.get('secret'), function(err, decoded) {      
+      		
+			if(!err){
+				req.decoded = decoded;
+				next();
+			} else {
+				res.send({
+					success: false,
+					reason: 'Failed to authenticate token.'
+				});	
+			}
+    	});
+
+
 	} else {
 		res.send({
 			success: false,
 			reason: "You need to be logged in to perform this action"
 		});
 	}
+
 };
 
 router.get('/', function(req, res) {
@@ -55,14 +72,6 @@ router.get('/', function(req, res) {
 
 router.post('/login', function(req, res) {   // what if aleady logged in ... 
 	
-
-	if(req.session.account) {
-		res.send({
-			success: true,
-		});
-
-		return;
-	}
 
 	if(!req.body.username || !req.body.password){    // you would want to test the length also .. 
 		
@@ -76,36 +85,29 @@ router.post('/login', function(req, res) {   // what if aleady logged in ...
 		Account.verify(req.body.username, req.body.password, function(resJSON){
 
 			if(resJSON.success){ 
+				
 				Account.getByUsername(req.body.username, function(account){
-					req.session.account = account;
-					res.send(resJSON);   // a little lausy code
-				}); 
+					
+					var token = jwt.sign(account._id.toString(), app.get('secret'));   // add expires in..	
+					resJSON.token = token;
+					res.send(resJSON);
+				});
+
 			} else {
 				res.send(resJSON);
 			}
-			
 		});
     }
 });
 
 router.post('/logout', function(req, res) {
 
-	req.session.destroy(function(){
-		res.send({
-			success: true
-		});
-	});
+	// delete token ..... 
 });
 
 router.post('/sign-up', function(req, res) {
 
-	if(req.session.account) {
-		res.send({   
-			success: true,
-		});
-
-		return;   // do something else actully ... 
-	}
+	// what if user is alreasy logged in
 
 	if(!req.body.username || !req.body.password){    // you would want to test the length also .. 
 		res.send({
@@ -118,7 +120,7 @@ router.post('/sign-up', function(req, res) {
 });
 
 router.get('/user', auth, function(req, res) {
-	Account.get(req.session.account._id, res.send.bind(res));
+	Account.get(req.decoded, res.send.bind(res));
 });
 
 router.post('/user/new', auth ,function(req, res) {
@@ -129,7 +131,7 @@ router.post('/user/new', auth ,function(req, res) {
 			reason: "Invalid Details"
 		});
 	} else {
-		Account.addDependent(req.session.account._id, req.body.username, req.body.password, res.send.bind(res));
+		Account.addDependent(req.decoded, req.body.username, req.body.password, res.send.bind(res));
 	}
 
 });
@@ -145,7 +147,7 @@ router.post('/money/debit', auth, function(req, res) {
 		return;
 	}
 
-	Account.debit(req.session.account._id, parseInt(req.body.amount), res.send.bind(res));
+	Account.debit(req.decoded, parseInt(req.body.amount), res.send.bind(res));
 });
 
 /*
@@ -164,7 +166,7 @@ router.post('/money/credit/:id', auth, function(req, res) {
 		return;
 	}
 	
-	Account.creditTo(req.session.account._id, req.params.id, parseInt(req.body.amount), res.send.bind(res));
+	Account.creditTo(req.decoded, req.params.id, parseInt(req.body.amount), res.send.bind(res));
 });
 
 // REGISTER OUR ROUTES -------------------------------

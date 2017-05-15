@@ -7,9 +7,11 @@ angular.module("indexModule").controller("LoginController", [ '$scope' , "Locati
 			$scope.errorMessage = "";
 
 			Rest.login($scope.username, $scope.password, function(responseObj){
-				if(responseObj.success){
+				if(responseObj.success) {
 					if(responseObj.response.success){   // login successful
-						State.setLoggedIn();
+						console.log(responseObj);
+						console.log(responseObj.response.token);
+						State.setLoggedIn(responseObj.response.token);
 						Location.land();
 					} else {			// login failed
 						$scope.errorMessage = responseObj.response.reason;
